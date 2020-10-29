@@ -61,6 +61,7 @@ Usage: $0 [OPTION]... [VAR=VALUE]...
     --disable-archiver     don't build or install zeek-archiver tool
     --disable-python       don't try to build python bindings for Broker
     --disable-broker-tests don't try to build Broker unit tests
+    --disable-zkg          don't install zkg
 
   Required Packages in Non-Standard Locations:
     --with-openssl=PATH    path to OpenSSL install root
@@ -148,7 +149,7 @@ prefix=/usr/local/zeek
 CMakeCacheEntries=""
 append_cache_entry CMAKE_INSTALL_PREFIX PATH   $prefix
 append_cache_entry ZEEK_ROOT_DIR        PATH   $prefix
-append_cache_entry PY_MOD_INSTALL_DIR   PATH   $prefix/lib/zeekctl
+append_cache_entry PY_MOD_INSTALL_DIR   PATH   $CMAKE_INSTALL_LIBDIR/python
 append_cache_entry ZEEK_SCRIPT_INSTALL_PATH STRING $prefix/share/zeek
 append_cache_entry ZEEK_ETC_INSTALL_DIR PATH   $prefix/etc
 append_cache_entry ENABLE_DEBUG         BOOL   false
@@ -158,6 +159,7 @@ append_cache_entry BUILD_SHARED_LIBS    BOOL   true
 append_cache_entry INSTALL_AUX_TOOLS    BOOL   true
 append_cache_entry INSTALL_ZEEK_ARCHIVER BOOL  true
 append_cache_entry INSTALL_ZEEKCTL      BOOL   true
+append_cache_entry INSTALL_ZKG          BOOL   true
 append_cache_entry CPACK_SOURCE_IGNORE_FILES STRING
 append_cache_entry ENABLE_MOBILE_IPV6   BOOL   false
 append_cache_entry ZEEK_SANITIZERS      STRING ""
@@ -201,12 +203,16 @@ while [ $# -ne 0 ]; do
             ;;
         --prefix=*)
             prefix=$optarg
+            libdir=$optarg/lib
             append_cache_entry CMAKE_INSTALL_PREFIX PATH   $optarg
             append_cache_entry ZEEK_ROOT_DIR        PATH   $optarg
-            append_cache_entry PY_MOD_INSTALL_DIR   PATH   $optarg/lib/zeekctl
+            append_cache_entry CMAKE_INSTALL_LIBDIR PATH   $optarg/lib
+            append_cache_entry PY_MOD_INSTALL_DIR   PATH   $optarg/lib/python
             ;;
         --libdir=*)
+            libdir=$optarg
             append_cache_entry CMAKE_INSTALL_LIBDIR PATH   $optarg
+            append_cache_entry PY_MOD_INSTALL_DIR   PATH   $optarg/python
             ;;
         --scriptdir=*)
             append_cache_entry ZEEK_SCRIPT_INSTALL_PATH STRING $optarg
@@ -278,6 +284,9 @@ while [ $# -ne 0 ]; do
         --disable-broker-tests)
             append_cache_entry BROKER_DISABLE_TESTS        BOOL true
             append_cache_entry BROKER_DISABLE_DOC_EXAMPLES BOOL true
+            ;;
+        --disable-zkg)
+            append_cache_entry INSTALL_ZKG BOOL false
             ;;
         --with-openssl=*)
             append_cache_entry OPENSSL_ROOT_DIR PATH $optarg
