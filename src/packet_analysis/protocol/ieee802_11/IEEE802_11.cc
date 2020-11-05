@@ -16,7 +16,7 @@ bool IEEE802_11Analyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* 
 
 	if ( len_80211 >= len )
 		{
-		packet->Weird("truncated_802_11_header");
+		Weird("truncated_802_11_header", packet);
 		return false;
 		}
 
@@ -48,7 +48,7 @@ bool IEEE802_11Analyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* 
 
 	if ( len_80211 >= len )
 		{
-		packet->Weird("truncated_802_11_header");
+		Weird("truncated_802_11_header", packet);
 		return false;
 		}
 
@@ -83,7 +83,7 @@ bool IEEE802_11Analyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* 
 	len_80211 += 8;
 	if ( len_80211 >= len )
 		{
-		packet->Weird("truncated_802_11_header");
+		Weird("truncated_802_11_header", packet);
 		return false;
 		}
 

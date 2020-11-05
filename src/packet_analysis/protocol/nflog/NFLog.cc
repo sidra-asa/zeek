@@ -14,7 +14,7 @@ bool NFLogAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packe
 	{
 	if ( 4 >= len )
 		{
-		packet->Weird("truncated_nflog_header");
+		Weird("truncated_nflog_header", packet);
 		return false;
 		}
 
@@ -24,7 +24,7 @@ bool NFLogAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packe
 
 	if ( version != 0 )
 		{
-		packet->Weird("unknown_nflog_version");
+		Weird("unknown_nflog_version", packet);
 		return false;
 		}
 
@@ -39,7 +39,7 @@ bool NFLogAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packe
 		{
 		if ( 4 >= len )
 			{
-			packet->Weird("nflog_no_pcap_payload");
+			Weird("nflog_no_pcap_payload", packet);
 			return false;
 			}
 
@@ -67,7 +67,7 @@ bool NFLogAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packe
 
 			if ( tlv_len < 4 )
 				{
-				packet->Weird("nflog_bad_tlv_len");
+				Weird("nflog_bad_tlv_len", packet);
 				return false;
 				}
 			else

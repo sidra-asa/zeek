@@ -6,8 +6,8 @@
 #open	2020-10-14-18-44-07
 #fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	name	addl	notice	peer
 #types	time	string	addr	port	addr	port	string	string	bool	string
-1332784981.078396	-	127.0.0.1	0	127.0.0.1	0	bad_IP_checksum	-	F	zeek
-#close	2020-10-14-18-44-07
+XXXXXXXXXX.XXXXXX	-	127.0.0.1	0	127.0.0.1	0	bad_IP_checksum	packet_analysis::IP	F	zeek
+#close XXXX-XX-XX-XX-XX-XX
 #separator \x09
 #set_separator	,
 #empty_field	(empty)
@@ -54,50 +54,50 @@
 #empty_field	(empty)
 #unset_field	-
 #path	weird
-#open	2020-10-14-18-44-10
+#open XXXX-XX-XX-XX-XX-XX
 #fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	name	addl	notice	peer
 #types	time	string	addr	port	addr	port	string	string	bool	string
-1332782580.798420	-	2001:4f8:4:7:2e0:81ff:fe52:ffff	0	2001:78:1:32::2	0	routing0_hdr	-	F	zeek
-1332782580.798420	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	30000	2001:78:1:32::2	13000	bad_UDP_checksum	-	F	zeek
-#close	2020-10-14-18-44-10
+XXXXXXXXXX.XXXXXX	-	2001:4f8:4:7:2e0:81ff:fe52:ffff	0	2001:78:1:32::2	0	routing0_hdr	-	F	zeek
+XXXXXXXXXX.XXXXXX	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	30000	2001:78:1:32::2	13000	bad_UDP_checksum	-	F	zeek
+#close XXXX-XX-XX-XX-XX-XX
 #separator \x09
 #set_separator	,
 #empty_field	(empty)
 #unset_field	-
 #path	weird
-#open	2020-10-14-18-44-11
+#open XXXX-XX-XX-XX-XX-XX
 #fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	name	addl	notice	peer
 #types	time	string	addr	port	addr	port	string	string	bool	string
-1334075111.800086	-	2001:4f8:4:7:2e0:81ff:fe52:ffff	0	2001:78:1:32::1	0	routing0_hdr	-	F	zeek
-1334075111.800086	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	128	2001:78:1:32::1	129	bad_ICMP_checksum	-	F	zeek
-#close	2020-10-14-18-44-11
+XXXXXXXXXX.XXXXXX	-	2001:4f8:4:7:2e0:81ff:fe52:ffff	0	2001:78:1:32::1	0	routing0_hdr	-	F	zeek
+XXXXXXXXXX.XXXXXX	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	128	2001:78:1:32::1	129	bad_ICMP_checksum	-	F	zeek
+#close XXXX-XX-XX-XX-XX-XX
 #separator \x09
 #set_separator	,
 #empty_field	(empty)
 #unset_field	-
 #path	weird
-#open	2020-10-14-18-44-11
+#open XXXX-XX-XX-XX-XX-XX
 #fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	name	addl	notice	peer
 #types	time	string	addr	port	addr	port	string	string	bool	string
-1332785250.469132	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	30000	2001:4f8:4:7:2e0:81ff:fe52:9a6b	80	bad_TCP_checksum	-	F	zeek
-#close	2020-10-14-18-44-11
+XXXXXXXXXX.XXXXXX	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	30000	2001:4f8:4:7:2e0:81ff:fe52:9a6b	80	bad_TCP_checksum	-	F	zeek
+#close XXXX-XX-XX-XX-XX-XX
 #separator \x09
 #set_separator	,
 #empty_field	(empty)
 #unset_field	-
 #path	weird
-#open	2020-10-14-18-44-12
+#open XXXX-XX-XX-XX-XX-XX
 #fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	name	addl	notice	peer
 #types	time	string	addr	port	addr	port	string	string	bool	string
-1332781342.923813	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	30000	2001:4f8:4:7:2e0:81ff:fe52:9a6b	13000	bad_UDP_checksum	-	F	zeek
-#close	2020-10-14-18-44-12
+XXXXXXXXXX.XXXXXX	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	30000	2001:4f8:4:7:2e0:81ff:fe52:9a6b	13000	bad_UDP_checksum	-	F	zeek
+#close XXXX-XX-XX-XX-XX-XX
 #separator \x09
 #set_separator	,
 #empty_field	(empty)
 #unset_field	-
 #path	weird
-#open	2020-10-14-18-44-12
+#open XXXX-XX-XX-XX-XX-XX
 #fields	ts	uid	id.orig_h	id.orig_p	id.resp_h	id.resp_p	name	addl	notice	peer
 #types	time	string	addr	port	addr	port	string	string	bool	string
-1334074939.467194	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	128	2001:4f8:4:7:2e0:81ff:fe52:9a6b	129	bad_ICMP_checksum	-	F	zeek
-#close	2020-10-14-18-44-12
+XXXXXXXXXX.XXXXXX	CHhAvVGS1DHFjwGM9	2001:4f8:4:7:2e0:81ff:fe52:ffff	128	2001:4f8:4:7:2e0:81ff:fe52:9a6b	129	bad_ICMP_checksum	-	F	zeek
+#close XXXX-XX-XX-XX-XX-XX

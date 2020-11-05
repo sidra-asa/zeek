@@ -5,6 +5,8 @@
 #include "zeek/Dict.h"
 #include "zeek/DebugLogger.h"
 #include "zeek/RunState.h"
+#include "zeek/Sessions.h"
+#include "zeek/util.h"
 
 namespace zeek::packet_analysis {
 
@@ -116,4 +118,18 @@ void Analyzer::RegisterProtocol(uint32_t identifier, AnalyzerPtr child)
 	dispatcher.Register(identifier, std::move(child));
 	}
 
+void Analyzer::Weird(const char* name, Packet* packet, const char* addl)
+	{
+	std::string addl_str = "packet_analysis::";
+	addl_str.append(GetAnalyzerName());
+
+	if ( strlen(addl) > 0 )
+		{
+		addl_str.append(" ");
+		addl_str.append(addl);
+		}
+
+	sessions->Weird(name, packet, addl_str.c_str());
 }
+
+} // namespace zeek::packet_analysis

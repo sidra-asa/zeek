@@ -88,7 +88,7 @@ bool ARPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 	// Check whether the header is complete.
 	if ( sizeof(struct arp_pkthdr) > len )
 		{
-		packet->Weird("truncated_ARP");
+		Weird("truncated_ARP", packet);
 		return false;
 		}
 
@@ -99,7 +99,7 @@ bool ARPAnalyzer::AnalyzePacket(size_t len, const uint8_t* data, Packet* packet)
 	size_t min_length = (ar_tpa(ah) - (char*) data) + ah->ar_pln;
 	if ( min_length > len )
 		{
-		packet->Weird("truncated_ARP");
+		Weird("truncated_ARP", packet);
 		return false;
 		}
 
