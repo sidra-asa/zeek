@@ -140,7 +140,7 @@ void Manager::SearchDynamicPlugins(const std::string& dir)
 	closedir(d);
 	}
 
-bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_not_found)
+bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_not_found, std::vector<std::string>* errors)
 	{
 	dynamic_plugin_map::iterator m = dynamic_plugins.find(util::strtolower(name));
 
@@ -160,7 +160,7 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 				return true;
 			}
 
-		reporter->Error("plugin %s is not available", name.c_str());
+		errors->push_back(util::fmt("plugin %s is not available", name.c_str()));
 		return false;
 		}
 
@@ -197,11 +197,14 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 			if ( ! hdl )
 				{
 				const char* err = dlerror();
-				reporter->FatalError("cannot load plugin library %s: %s", path, err ? err : "<unknown error>");
+				errors->push_back(util::fmt("cannot load plugin library %s: %s", path, err ? err : "<unknown error>"));
+				return false;
 				}
 
-			if ( ! current_plugin )
-				reporter->FatalError("load plugin library %s did not instantiate a plugin", path);
+			if ( ! current_plugin ) {
+				errors->push_back(util::fmt("load plugin library %s did not instantiate a plugin", path));
+				return false;
+			}
 
 			current_plugin->SetDynamic(true);
 			current_plugin->DoConfigure();
@@ -217,9 +220,11 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 
 			// Make sure the name the plugin reports is consistent with
 			// what we expect from its magic file.
-			if ( util::strtolower(current_plugin->Name()) != util::strtolower(name) )
-				reporter->FatalError("inconsistent plugin name: %s vs %s",
-						     current_plugin->Name().c_str(), name.c_str());
+			if ( util::strtolower(current_plugin->Name()) != util::strtolower(name) ) {
+				errors->push_back(util::fmt("inconsistent plugin name: %s vs %s",
+						     current_plugin->Name().c_str(), name.c_str()));
+				return false;
+			}
 
 			current_dir = nullptr;
 			current_sopath = nullptr;
@@ -235,7 +240,7 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 		{
 		DBG_LOG(DBG_PLUGINS, "  No shared library found");
 		}
-    
+
 	// Add the "scripts" and "bif" directories to ZEEKPATH.
 	std::string scripts = dir + "scripts";
 
@@ -294,37 +299,56 @@ bool Manager::ActivateDynamicPluginInternal(const std::string& name, bool ok_if_
 	return true;
 	}
 
-bool Manager::ActivateDynamicPlugin(const std::string& name)
-	{
-	if ( ! ActivateDynamicPluginInternal(name) )
-		return false;
+void Manager::ActivateDynamicPlugins(bool all) {
+	// Track which plugins we have to activate pairs of their names and
+	// booleans indicating whether an activation failure is to be deemed a
+	// fatal error.
+	std::set<std::pair<std::string, bool>> plugins_to_load;
 
-	UpdateInputFiles();
-	return true;
-	}
+	// Activate plugins that were specifically requested.
+	for ( const auto& x : requested_plugins )
+		plugins_to_load.emplace(x, false);
 
-bool Manager::ActivateDynamicPlugins(bool all)
-	{
 	// Activate plugins that our environment tells us to.
 	vector<string> p;
 	util::tokenize_string(util::zeek_plugin_activate(), ",", &p);
 
-	for ( size_t n = 0; n < p.size(); ++n )
-		ActivateDynamicPluginInternal(p[n], true);
+	for ( const auto& x : p )
+		plugins_to_load.emplace(x, true);
 
 	if ( all )
 		{
-		for ( dynamic_plugin_map::const_iterator i = dynamic_plugins.begin();
-		      i != dynamic_plugins.end(); i++ )
+		// Activate all other ones we found as well.
+		for ( const auto& x : dynamic_plugins )
+			plugins_to_load.emplace(x.first, false);
+		}
+
+	// We keep iterating over all the plugins, trying to load them, for as long
+	// as we're successful with at least one further of them each round. Doing
+	// so ensures that we can resolve (non-cyclic) load dependencies
+	// independent of any particular order.
+	while ( ! plugins_to_load.empty() ) { std::vector<std::string> errors; auto
+		plugins_left = plugins_to_load;
+
+		for ( const auto& x : plugins_to_load )
 			{
-			if ( ! ActivateDynamicPluginInternal(i->first) )
-				return false;
+			if ( ActivateDynamicPluginInternal(x.first, x.second, &errors) )
+				plugins_left.erase(x);
 			}
+
+		if ( plugins_left.size() == plugins_to_load.size() )
+			{
+			// Could not load a single further plugin this round, that's fatal.
+			for ( const auto& msg : errors )
+				reporter->Error("%s", msg.c_str());
+
+			reporter->FatalError("aborting after plugin errors");
+			}
+
+		plugins_to_load = std::move(plugins_left);
 		}
 
 	UpdateInputFiles();
-
-	return true;
 	}
 
 void Manager::UpdateInputFiles()

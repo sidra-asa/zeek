@@ -63,6 +63,12 @@ public:
 	virtual ~Manager();
 
 	/**
+	 * Request a plugin to be loaded. This only schedules the plugin for loading,
+	 * the actual loading will happen later with ActivateDynamicPlugins().
+	 */
+	void RequestPlugin(std::string name) { requested_plugins.insert(std::move(name)); }
+
+	/**
 	 * Searches a set of directories for plugins. If a specified directory
 	 * does not contain a plugin itself, the method searches for plugins
 	 * recursively. For plugins found, the method makes them available for
@@ -76,32 +82,21 @@ public:
 	void SearchDynamicPlugins(const std::string& dir);
 
 	/**
-	 * Activates a plugin that SearchDynamicPlugins() has previously discovered.
-	 * Activating a plugin involves loading its dynamic module, making its
-	 * bifs available, and adding its script paths to ZEEKPATH.
-	 *
-	 * @param name The name of the plugin, as found previously by
-	 * SearchPlugin().
-	 *
-	 * @return True if the plugin has been loaded successfully.
-	 *
-	 */
-	bool ActivateDynamicPlugin(const std::string& name);
-
-	/**
-	 * Activates plugins that SearchDynamicPlugins() has previously discovered.
-	 * The effect is the same all calling \a ActivePlugin(name) for each plugin.
+	 * Activates plugins that were either explicitly requested or that
+	 * SearchDynamicPlugins() has previously discovered. The effect is the same
+	 * all calling \a ActivatePlugin(name) for each plugin. The function will
+	 * abort with a fatal error if it cannot load all plugins as expected.
 	 *
 	 * @param all If true, activates all plugins that are found. If false,
 	 * activates only those that should always be activated unconditionally,
-	 * as specified via the ZEEK_PLUGIN_ACTIVATE enviroment variable. In other
+	 * as specified via the ZEEK_PLUGIN_ACTIVATE environment variable. In other
 	 * words, it's \c true in standard mode and \c false in bare mode.
 	 *
 	 * @return True if all plugins have been loaded successfully. If one
 	 * fails to load, the method stops there without loading any further ones
-	 * and returns false.
+	 * and returns false. Errors will have been reported.
 	 */
-	bool ActivateDynamicPlugins(bool all);
+	void ActivateDynamicPlugins(bool all);
 
 	/**
 	 * First-stage initializion of the manager. This is called early on
@@ -414,10 +409,13 @@ public:
 	static void RegisterBifFile(const char* plugin, bif_init_func c);
 
 private:
-	bool ActivateDynamicPluginInternal(const std::string& name, bool ok_if_not_found = false);
+	bool ActivateDynamicPluginInternal(const std::string& name, bool ok_if_not_found, std::vector<std::string>* errors);
 	void UpdateInputFiles();
 	void MetaHookPre(HookType hook, const HookArgumentList& args) const;
 	void MetaHookPost(HookType hook, const HookArgumentList& args, HookArgument result) const;
+
+	// Plugins explicitly requested to be activated.
+	std::set<std::string> requested_plugins;
 
 	 // All found dynamic plugins, mapping their names to base directory.
 	using dynamic_plugin_map = std::map<std::string, std::string>;

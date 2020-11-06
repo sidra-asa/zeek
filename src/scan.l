@@ -376,7 +376,7 @@ when	return TOK_WHEN;
 	switch ( rc ) {
 	case -1:
 		// No plugin in charge of this file.
-		zeek::plugin_mgr->ActivateDynamicPlugin(plugin);
+		zeek::plugin_mgr->RequestPlugin(plugin);
 		break;
 
 	case 0:
