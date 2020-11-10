@@ -1,5 +1,5 @@
-#include <List.h>
 #include <3rdparty/doctest.h>
+#include <List.h>
 
 TEST_CASE("list construction")
 	{
@@ -13,7 +13,7 @@ TEST_CASE("list construction")
 
 TEST_CASE("list operation")
 	{
-	zeek::List<int> list({ 1, 2, 3 });
+	zeek::List<int> list({1, 2, 3});
 	CHECK(list.size() == 3);
 	CHECK(list.max() == 3);
 	CHECK(list[0] == 1);
@@ -85,14 +85,14 @@ TEST_CASE("list operation")
 
 TEST_CASE("list iteration")
 	{
-	zeek::List<int> list({ 1, 2, 3, 4});
+	zeek::List<int> list({1, 2, 3, 4});
 
 	int index = 1;
 	for ( int v : list )
 		CHECK(v == index++);
 
 	index = 1;
-	for ( auto it = list.begin(); it != list.end(); index++, ++it)
+	for ( auto it = list.begin(); it != list.end(); index++, ++it )
 		CHECK(*it == index);
 	}
 
