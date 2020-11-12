@@ -61,6 +61,10 @@ export {
 		Z:             count              &log &default=0;
 		## The set of resource descriptions in the query answer.
 		answers:       vector of string   &log &optional;
+		## A RTYPE value set specifying the type of the answser.
+		rtypes:         vector of count    &log &optional;
+		## A descriptive name set for the type of the query.
+		rtype_names:    vector of string   &log &optional;
 		## The caching intervals of the associated RRs described by the
 		## *answers* field.
 		TTLs:          vector of interval &log &optional;
@@ -237,27 +241,18 @@ hook set_session(c: connection, msg: dns_msg, is_query: bool) &priority=5
 
 	if ( is_query )
 		{
-		if ( c$dns_state?$pending_replies && msg$id in c$dns_state$pending_replies &&
-		     Queue::len(c$dns_state$pending_replies[msg$id]) > 0 )
+		c$dns = new_session(c, msg$id);
+		if( ! c$dns_state?$pending_query )
 			{
-			# Match this DNS query w/ what's at head of pending reply queue.
-			c$dns = pop_msg(c$dns_state$pending_replies, msg$id);
+			c$dns_state$pending_query = c$dns;
 			}
 		else
 			{
-			# Create a new DNS session and put it in the query queue so
-			# we can wait for a matching reply.
-			c$dns = new_session(c, msg$id);
-
-			if( ! c$dns_state?$pending_query )
-				c$dns_state$pending_query = c$dns;
-			else
+			if( !c$dns_state?$pending_queries )
 				{
-				if( !c$dns_state?$pending_queries )
-					c$dns_state$pending_queries = table();
-
-				enqueue_new_msg(c$dns_state$pending_queries, msg$id, c$dns);
+				c$dns_state$pending_queries = table();
 				}
+			enqueue_new_msg(c$dns_state$pending_queries, msg$id, c$dns);
 			}
 		}
 	else
@@ -372,6 +367,19 @@ hook DNS::do_reply(c: connection, msg: dns_msg, ans: dns_answer, reply: string) 
 			if ( ! c$dns?$answers )
 				c$dns$answers = vector();
 			c$dns$answers += reply;
+
+			# Add answer type
+			if ( ! c$dns?$rtypes )
+				{
+				c$dns$rtypes = vector();
+				}
+			c$dns$rtypes += ans$qtype;
+
+			if ( ! c$dns?$rtype_names )
+				{
+				c$dns$rtype_names = vector();
+				}
+			c$dns$rtype_names += query_types[ans$qtype];
 
 			if ( ! c$dns?$TTLs )
 				c$dns$TTLs = vector();
@@ -569,6 +577,7 @@ event dns_rejected(c: connection, msg: dns_msg, query: string, qtype: count, qcl
 	{
 	if ( c?$dns )
 		c$dns$rejected = T;
+		c$dns$query = query;
 	}
 
 event connection_state_remove(c: connection) &priority=-5
